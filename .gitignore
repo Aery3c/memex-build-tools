@@ -1,0 +1,15 @@
+# dependencies
+node_modules
+
+# ide
+.vscode
+
+# test
+src
+_build
+
+
+.DS_Store
+
+
+
