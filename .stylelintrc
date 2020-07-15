@@ -1,0 +1,6 @@
+{
+  "extends": [
+    "/Users/wubaijiang/Code/memex-build-tools/node_modules/stylelint-config-recommended",
+    "/Users/wubaijiang/Code/memex-build-tools/node_modules/stylelint-config-styled-components"
+  ]
+}

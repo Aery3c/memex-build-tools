@@ -27,7 +27,7 @@ const {
 
 const useYarn = fs.existsSync(paths.yarnLockFile)
 // 判断Node.js是否运行在TTY上下文
-const isInteractive = process.stdout.isTTY 
+const isInteractive = process.stdout.isTTY
 const config = require('./development')
 
 utilities.copyPublicFolder(paths)
@@ -39,7 +39,7 @@ utilities.generateManifest(paths)
 // #https://www.npmjs.com/package/react-dev-utils#chooseporthost-string-defaultport-number-promisenumber--null
 choosePort(HOST, DEFAULT_PORT)
   .then(port => {
-    if(port === null) return 
+    if (port === null) return
 
     const protocol = process.env.HTTPS === 'true' ? 'https' : 'http'
     const appName = require(paths.appPackageJson).name
@@ -49,7 +49,7 @@ choosePort(HOST, DEFAULT_PORT)
     // #https://www.npmjs.com/package/react-dev-utils#prepareurlsprotocol-string-host-string-port-number-pathname-string---object
     const urls = prepareUrls(protocol, HOST, port)
     // 创建一个配置自定义消息的webpack编译器。
-    const compiler = createCompiler({webpack, urls, useYarn, config, appName})
+    const compiler = createCompiler({ webpack, urls, useYarn, config, appName })
 
     const serverConfig = createDevServerConfig()
 
@@ -62,19 +62,17 @@ choosePort(HOST, DEFAULT_PORT)
 
       console.log(chalk.cyan('Starting the development server...\n'))
     })
-    ;['SIGINT', 'SIGTERM'].forEach(function(sig) {
-      process.on(sig, function() {
+    ;['SIGINT', 'SIGTERM'].forEach(function (sig) {
+      process.on(sig, function () {
         devServer.close()
         process.exit()
       })
     })
-
   })
   .catch(err => {
-    console.log("choosePort 异常")
-    if( err && err.message ) {
+    console.log('choosePort 异常')
+    if (err && err.message) {
       console.log(err.message)
     }
     process.exit(1)
   })
-
