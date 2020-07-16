@@ -2,6 +2,7 @@
 
 const path = require('path')
 const fs = require('fs')
+const getPublicUrlOrPath = require('react-dev-utils/getPublicUrlOrPath')
 
 /**
  * @description appDirectory = 扩展应用程序的根目录
@@ -10,6 +11,11 @@ const fs = require('fs')
 const appDirectory = fs.realpathSync(process.cwd())
 const resolveApp = relativePath => path.resolve(appDirectory, relativePath)
 
+const publicUrlOrPath = getPublicUrlOrPath(
+  process.env.NODE_ENV === 'development',
+  require(resolveApp('package.json')).homepage,
+  process.env.PUBLIC_URL
+)
 module.exports = {
   appPackageJson: resolveApp('package.json'),
   appBuildDefault: resolveApp('_build/_dev'),
@@ -22,5 +28,6 @@ module.exports = {
   appSaveHTML: resolveApp('src/containers/save/save.html'),
   appSrc: resolveApp('src'),
   appSaveJs: resolveApp('src/containers/save/save'),
-  appLoginJs: resolveApp('src/containers/auth/login')
+  appLoginJs: resolveApp('src/containers/auth/login'),
+  publicUrlOrPath
 }
