@@ -4,6 +4,7 @@ const eslintFormatter = require('react-dev-utils/eslintFormatter')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
 const WatchModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
+const ChromeExtensionReloader = require('webpack-chrome-extension-reloader')
 
 const path = require('path')
 const paths = require('./paths')
@@ -36,6 +37,7 @@ module.exports = {
   output: {
     path: paths.appBuildDefault,
     filename: 'js/[name].bundle.js',
+    chunkFilename: 'js/[name].chunk.js'
   },
   module: {
     rules: [
@@ -127,12 +129,12 @@ module.exports = {
     ]
   },
   plugins: [
-    // new HtmlWebpackPlugin({
-    //   inject: true,
-    //   template: paths.appSaveHTML,
-    //   filename: 'save.html',
-    //   chunks: ['save']
-    // }),
+    new HtmlWebpackPlugin({
+      inject: true,
+      template: paths.appSaveHTML,
+      filename: 'save.html',
+      chunks: ['save']
+    }),
     // 向工厂函数添加模块名称，这样它们就会出现在浏览器分析器中。
     new webpack.NamedModulesPlugin(),
     // 使JS代码可以使用一些环境变量，例如:
@@ -148,7 +150,14 @@ module.exports = {
     // to restart the development server for Webpack to discover it. This plugin
     // makes the discovery automatic so you don't have to restart.
     // See https://github.com/facebookincubator/create-react-app/issues/186
-    new WatchModulesPlugin(paths.appNodeModules)
+    new WatchModulesPlugin(paths.appNodeModules),
+    // #https://github.com/rubenspgcavalcante/webpack-chrome-extension-reloader
+    new ChromeExtensionReloader({
+      reloadPage: true,
+      entries: {
+        contentScript: ['save.bundle.js', 'frame.bundle.js']
+      }
+    })
   ],
   // 在开发期间关闭性能提示，因为我们不做任何提示
   // 为了提高速度而进行的分割或缩小。这些警告成为麻烦。
