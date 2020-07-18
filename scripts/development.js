@@ -37,7 +37,8 @@ module.exports = {
   output: {
     path: paths.appBuildDefault,
     filename: 'js/[name].bundle.js',
-    chunkFilename: 'js/[name].chunk.js'
+    chunkFilename: 'js/[name].chunk.js',
+    publicPath: '/'
   },
   module: {
     rules: [
@@ -129,6 +130,10 @@ module.exports = {
     ]
   },
   plugins: [
+    new HtmlWebpackPlugin({
+      inject: true,
+      template: paths.appHtml
+    }),
     new HtmlWebpackPlugin({
       inject: true,
       template: paths.appSaveHTML,

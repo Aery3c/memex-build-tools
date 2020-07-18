@@ -1,11 +1,13 @@
 'use strict'
 
 const path = require('path')
-const paths = require('./paths')
 
-module.exports = function () {
+module.exports = function (paths, config) {
   return {
     clientLogLevel: 'none',
+    // It is important to tell WebpackDevServer to use the same "root" path
+    // as we specified in the config. In development, we always serve from /.
+    publicPath: config.output.publicPath,
     // 由于使用react-dev-utils工具已经创建了compiler, 已经内置了更友好的输出,
     // 所以在这个地方屏蔽掉webpackDevServer的所有编译输出
     quiet: true,

@@ -20,6 +20,7 @@ module.exports = {
   appPackageJson: resolveApp('package.json'),
   appBuildDefault: resolveApp('_build/_dev'),
   appPublic: resolveApp('public'),
+  appHtml: resolveApp('public/index.html'),
   appBackground: resolveApp('src/containers/background/background'),
   appNodeModules: resolveApp('node_modules'),
   yarnLockFile: resolveApp('yarn.lock'),

@@ -51,7 +51,7 @@ choosePort(HOST, DEFAULT_PORT)
     // 创建一个配置自定义消息的webpack编译器。
     const compiler = createCompiler({ webpack, urls, useYarn, config, appName })
 
-    const serverConfig = createDevServerConfig()
+    const serverConfig = createDevServerConfig(paths, config)
 
     const devServer = new WebpackDevServer(compiler, serverConfig)
     // Launch WebpackDevServer.
