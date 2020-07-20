@@ -30,5 +30,7 @@ module.exports = {
   appSrc: resolveApp('src'),
   appSaveJs: resolveApp('src/containers/save/save'),
   appLoginJs: resolveApp('src/containers/auth/login'),
+  appReceiverJs: resolveApp('src/containers/auth/receiver'),
+  appWsmwuJs: resolveApp('src/containers/wsmwu/wsmwu.js'),
   publicUrlOrPath
 }

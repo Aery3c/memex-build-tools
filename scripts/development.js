@@ -32,7 +32,9 @@ module.exports = {
     background: [paths.appBackground],
     frame: [paths.appFrameJs],
     save: [paths.appSaveJs],
-    login: [paths.appLoginJs]
+    login: [paths.appLoginJs],
+    receiver: [paths.appReceiverJs],
+    wsmwu: [paths.appWsmwuJs]
   },
   output: {
     path: paths.appBuildDefault,
@@ -40,6 +42,7 @@ module.exports = {
     chunkFilename: 'js/[name].chunk.js',
     publicPath: '/'
   },
+  watch: true,
   module: {
     rules: [
       {
@@ -158,9 +161,9 @@ module.exports = {
     new WatchModulesPlugin(paths.appNodeModules),
     // #https://github.com/rubenspgcavalcante/webpack-chrome-extension-reloader
     new ChromeExtensionReloader({
-      reloadPage: true,
       entries: {
-        contentScript: ['save.bundle.js', 'frame.bundle.js']
+        contentScript: ['frame', 'save', 'login', 'receiver', 'wsmwu'], // Use the entry names, not the file name or the path
+        background: 'background' // *REQUIRED
       }
     })
   ],

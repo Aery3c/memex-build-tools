@@ -5,7 +5,7 @@
 // 忽视他们。在未来，承诺拒绝没有处理将会
 // 使用非零退出代码终止Node.js进程。
 process.on('unhandledRejection', err => {
-  throw err;
+  throw err
 })
 
 const spawn = require('react-dev-utils/crossSpawn')
@@ -25,14 +25,14 @@ if (['build', 'start', 'test'].includes(script)) {
       .concat(args.slice(scriptIndex + 1)),
     { stdio: 'inherit' }
   )
-	
+
   if (result.signal) {
     if (result.signal === 'SIGKILL') {
       console.log(
         'The build failed because the process exited too early. ' +
           'This probably means the system ran out of memory or someone called ' +
           '`kill -9` on the process.'
-      );
+      )
     } else if (result.signal === 'SIGTERM') {
       console.log(
         'The build failed because the process exited too early. ' +
@@ -40,16 +40,14 @@ if (['build', 'start', 'test'].includes(script)) {
           'be shutting down.'
       )
     }
-    process.exit(1);
+    process.exit(1)
   }
 
-	process.exit(result.status);
-
-}else {
-	console.log('Unknown script "' + script + '".');
-  console.log('Perhaps you need to update react-scripts?');
+  process.exit(result.status)
+} else {
+  console.log('Unknown script "' + script + '".')
+  console.log('Perhaps you need to update react-scripts?')
   console.log(
     'See: https://facebook.github.io/create-react-app/docs/updating-to-new-releases'
-  );
+  )
 }
-
