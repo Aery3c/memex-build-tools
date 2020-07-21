@@ -5,6 +5,8 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
 const WatchModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
 const ChromeExtensionReloader = require('webpack-chrome-extension-reloader')
+const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+const autoprefixer = require('autoprefixer')
 
 const path = require('path')
 const paths = require('./paths')
@@ -101,6 +103,44 @@ module.exports = {
               }
             ]
           },
+          {
+            test: /\.scss$/,
+            use: [
+              {
+                loader: MiniCssExtractPlugin.loader
+              },
+              {
+                loader: require.resolve('css-loader'),
+                options: {
+                  importLoaders: 1,
+                  modules: {
+                    localIdentName: '[local]_[hash:base64:5]' 
+                  }
+                }
+              },
+              {
+                loader: require.resolve('postcss-loader'),
+                options: {
+                  // Necessary for external CSS imports to work
+                  // https://github.com/facebookincubator/create-react-app/issues/2677
+                  ident: 'postcss',
+                  plugins: () => [
+                    require('postcss-flexbugs-fixes'),
+                    autoprefixer({
+                      overrideBrowserslist: [
+                        '>1%',
+                        'last 4 versions',
+                        'Firefox ESR',
+                        'not ie < 9' // React doesn't support IE8 anyway
+                      ],
+                      flexbox: 'no-2009'
+                    })
+                  ]
+                }
+              },
+              { loader: require.resolve('sass-loader') }
+            ]
+          },
           // "url" loader works like "file" loader except that it embeds assets
           // smaller than specified limit in bytes as data URLs to avoid requests.
           // A missing `test` is equivalent to a match.
@@ -165,6 +205,13 @@ module.exports = {
         contentScript: ['frame', 'save', 'login', 'receiver', 'wsmwu'], // Use the entry names, not the file name or the path
         background: 'background' // *REQUIRED
       }
+    }),
+    new MiniCssExtractPlugin({
+      // Options similar to the same options in webpackOptions.output
+      // all options are optional
+      filename: './css/[name].bundle.css',
+      chunkFilename: '[id].css',
+      ignoreOrder: false // Enable to remove warnings about conflicting order
     })
   ],
   // 在开发期间关闭性能提示，因为我们不做任何提示

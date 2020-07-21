@@ -7,7 +7,7 @@ node_modules
 # test
 src
 _build
-
+public
 
 .DS_Store
 
