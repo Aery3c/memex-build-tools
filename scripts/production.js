@@ -1,35 +1,25 @@
 'use strict'
+
+const autoprefixer = require('autoprefixer')
 const webpack = require('webpack')
 const eslintFormatter = require('react-dev-utils/eslintFormatter')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
-const WatchModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
-const ChromeExtensionReloader = require('webpack-chrome-extension-reloader')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
-const autoprefixer = require('autoprefixer')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin')
 
 const path = require('path')
 const paths = require('./paths')
 
 const getClientEnvironment = require('./env')
 
-// `publicUrl` is just like `publicPath`, but we will provide it to our app
-// as %PUBLIC_URL% in `index.html` and `process.env.PUBLIC_URL` in JavaScript.
-// Omit trailing slash as %PUBLIC_PATH%/xyz looks better than %PUBLIC_PATH%xyz.
 const publicUrl = paths.publicUrlOrPath
-
-// Get environment variables to inject into our app.
 const env = getClientEnvironment(publicUrl)
 
-const imageInlineSizeLimit = parseInt(
-  process.env.IMAGE_INLINE_SIZE_LIMIT || '10000'
-)
-
 module.exports = {
-  devtool: 'cheap-module-source-map',
+  // 如果有任何错误，不要尝试继续。
+  bail: true,
   // 提供mode配置选项将告诉webpack相应地使用其内置优化。
-  mode: 'development',
-
+  mode: 'production',
   entry: {
     background: [paths.appBackground],
     frame: [paths.appFrameJs],
@@ -40,11 +30,13 @@ module.exports = {
   },
   output: {
     path: paths.appBuildDefault,
+    // 这不会产生一个真正的文件。它只是WebpackDevServer在开发中提供的虚拟路径。
+    // 这是JS包，包含所有入口点的代码，以及Webpack运行时。
     filename: 'js/[name].bundle.js',
+    // 如果你使用代码分割，还有额外的JS块文件。
     chunkFilename: 'js/[name].chunk.js',
-    publicPath: '/'
+    publicPath: publicUrl
   },
-  watch: true,
   module: {
     rules: [
       {
@@ -70,7 +62,14 @@ module.exports = {
       },
       {
         oneOf: [
-          // Process JS with Babel.
+          {
+            test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
+            loader: require.resolve('url-loader'),
+            options: {
+              limit: 10000,
+              name: 'media/[name].[hash:8].[ext]'
+            }
+          },
           {
             test: /\.js$/,
             include: paths.appSrc,
@@ -85,10 +84,7 @@ module.exports = {
                   plugins: [
                     require.resolve('babel-plugin-styled-components')
                   ],
-                  // 这是webpack“Babel -loader”的一个特性(不是Babel本身)。
-                  // 它在./node_modules/.cache/babel-loader中启用缓存结果
-                  // 目录，以便更快地重新构建。
-                  cacheDirectory: true
+                  compact: true
                 }
               },
               {
@@ -141,31 +137,15 @@ module.exports = {
               { loader: require.resolve('sass-loader') }
             ]
           },
-          // "url" loader works like "file" loader except that it embeds assets
-          // smaller than specified limit in bytes as data URLs to avoid requests.
-          // A missing `test` is equivalent to a match.
           {
-            test: [/\.bmp$/, /\.gif$/, /\.jpe?g$/, /\.png$/],
-            loader: require.resolve('url-loader'),
-            options: {
-              limit: imageInlineSizeLimit,
-              name: 'static/media/[name].[hash:8].[ext]'
-            }
-          },
-          // "file" loader makes sure those assets get served by WebpackDevServer.
-          // When you `import` an asset, you get its (virtual) filename.
-          // In production, they would get copied to the `build` folder.
-          // This loader doesn't use a "test" so it will catch all modules
-          // that fall through the other loaders.
-          {
-            loader: require.resolve('file-loader'),
             // Exclude `js` files to keep "css" loader working as it injects
-            // its runtime that would otherwise be processed through "file" loader.
+            // it's runtime that would otherwise processed through "file" loader.
             // Also exclude `html` and `json` extensions so they get processed
             // by webpacks internal loaders.
-            exclude: [/\.(js|mjs|jsx|ts|tsx)$/, /\.html$/, /\.json$/],
+            exclude: [/\.js$/, /\.html$/, /\.json$/],
+            loader: require.resolve('file-loader'),
             options: {
-              name: 'static/media/[name].[hash:8].[ext]'
+              name: '[name].[hash:8].[ext]'
             }
           }
         ]
@@ -175,37 +155,29 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       inject: true,
-      template: paths.appHtml
-    }),
-    new HtmlWebpackPlugin({
-      inject: true,
       template: paths.appSaveHTML,
       filename: 'save.html',
-      chunks: ['save']
-    }),
-    // 向工厂函数添加模块名称，这样它们就会出现在浏览器分析器中。
-    new webpack.NamedModulesPlugin(),
-    // 使JS代码可以使用一些环境变量，例如:
-    // 如果(process.env。NODE_ENV === 'development'){…}。见“。env.js”。
-    new webpack.DefinePlugin(env.stringified),
-    // This is necessary to emit hot updates (currently CSS only):
-    new webpack.HotModuleReplacementPlugin(),
-    // Watcher doesn't work well if you mistype casing in a path so we use
-    // a plugin that prints an error when you attempt to do this.
-    // See https://github.com/facebookincubator/create-react-app/issues/240
-    new CaseSensitivePathsPlugin(),
-    // If you require a missing module and then `npm install` it, you still have
-    // to restart the development server for Webpack to discover it. This plugin
-    // makes the discovery automatic so you don't have to restart.
-    // See https://github.com/facebookincubator/create-react-app/issues/186
-    new WatchModulesPlugin(paths.appNodeModules),
-    // #https://github.com/rubenspgcavalcante/webpack-chrome-extension-reloader
-    new ChromeExtensionReloader({
-      entries: {
-        contentScript: ['frame', 'save', 'login', 'receiver', 'wsmwu'], // Use the entry names, not the file name or the path
-        background: 'background' // *REQUIRED
+      chunks: ['save'],
+      minify: {
+        removeComments: true,
+        collapseWhitespace: true,
+        removeRedundantAttributes: true,
+        useShortDoctype: true,
+        removeEmptyAttributes: true,
+        removeStyleLinkTypeAttributes: true,
+        keepClosingSlash: true,
+        minifyJS: true,
+        minifyCSS: true,
+        minifyURLs: true
       }
     }),
+    new webpack.DefinePlugin(env.stringified),
+    // Moment.js is an extremely popular library that bundles large locale files
+    // by default due to how Webpack interprets its code. This is a practical
+    // solution that requires the user to opt into importing specific locales.
+    // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
+    // You can remove this if you don't use Moment.js:
+    new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // all options are optional
@@ -214,9 +186,25 @@ module.exports = {
       ignoreOrder: false // Enable to remove warnings about conflicting order
     })
   ],
-  // 在开发期间关闭性能提示，因为我们不做任何提示
-  // 为了提高速度而进行的分割或缩小。这些警告成为麻烦。
-  performance: {
-    hints: false
+  optimization: {
+    minimizer: [new UglifyJsPlugin({
+      uglifyOptions: {
+        warnings: false,
+        compress: {
+          // Disabled because of an issue with Uglify breaking seemingly valid code:
+          // https://github.com/facebookincubator/create-react-app/issues/2376
+          // Pending further investigation:
+          // https://github.com/mishoo/UglifyJS2/issues/2011
+          comparisons: false
+        },
+        output: {
+          comments: false,
+          // Turned on because emoji and regex is not minified properly using default
+          // https://github.com/facebookincubator/create-react-app/issues/2488
+          ascii_only: true
+        },
+        sourceMap: true
+      }
+    })]
   }
 }

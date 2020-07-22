@@ -16,8 +16,10 @@ const publicUrlOrPath = getPublicUrlOrPath(
   require(resolveApp('package.json')).homepage,
   process.env.PUBLIC_URL
 )
+
 module.exports = {
   appPackageJson: resolveApp('package.json'),
+  appBuild: resolveApp('_build'),
   appBuildDefault: resolveApp('_build/_dev'),
   appPublic: resolveApp('public'),
   appHtml: resolveApp('public/index.html'),
