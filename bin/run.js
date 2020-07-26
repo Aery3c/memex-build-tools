@@ -9,13 +9,30 @@ process.on('unhandledRejection', err => {
 })
 
 const spawn = require('react-dev-utils/crossSpawn')
+const chalk = require('chalk')
+
 const args = process.argv.slice(2)
+
+const projectIndex = args.findIndex(
+  x => x === 'firefox' || x === 'chrome'
+)
+
+if (projectIndex === -1) {
+  console.log(chalk.red('\nOops! Incorrect Project Specified'))
+  console.log(chalk.green('\nValid options are:'))
+  console.log(chalk.cyan('1) firefox'))
+  console.log(chalk.blue('2) chrome'))
+  process.exit(1)
+}
+
+const project = args[projectIndex]
+process.env.PROJECT = project
 
 const scriptIndex = args.findIndex(
   x => x === 'build' || x === 'start' || x === 'test'
 )
 const script = scriptIndex === -1 ? args[0] : args[scriptIndex]
-const nodeArgs = scriptIndex > 0 ? args.slice(0, scriptIndex) : []
+const nodeArgs = scriptIndex > 0 ? args.slice(0, projectIndex) : []
 
 if (['build', 'start', 'test'].includes(script)) {
   const result = spawn.sync(

@@ -5,7 +5,10 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
 const WatchModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin')
 const ChromeExtensionReloader = require('webpack-chrome-extension-reloader')
+
+const WebExtWebpackPlugin = require('@ianwalter/web-ext-webpack-plugin')
 const MiniCssExtractPlugin = require('mini-css-extract-plugin')
+
 const autoprefixer = require('autoprefixer')
 
 const path = require('path')
@@ -200,12 +203,15 @@ module.exports = {
     // See https://github.com/facebookincubator/create-react-app/issues/186
     new WatchModulesPlugin(paths.appNodeModules),
     // #https://github.com/rubenspgcavalcante/webpack-chrome-extension-reloader
-    new ChromeExtensionReloader({
-      entries: {
-        contentScript: ['frame', 'save', 'login', 'receiver', 'wsmwu'], // Use the entry names, not the file name or the path
-        background: 'background' // *REQUIRED
-      }
-    }),
+    // #https://www.npmjs.com/package/@ianwalter/web-ext-webpack-plugin
+    process.env.PROJECT === 'firefox'
+      ? new WebExtWebpackPlugin({ sourceDir: paths.appBuildDefault })
+      : new ChromeExtensionReloader({
+        entries: {
+          contentScript: ['frame', 'save', 'login', 'receiver', 'wsmwu'], // Use the entry names, not the file name or the path
+          background: 'background' // *REQUIRED
+        }
+      }),
     new MiniCssExtractPlugin({
       // Options similar to the same options in webpackOptions.output
       // all options are optional

@@ -8,6 +8,7 @@
   },
   "scripts": {},
   "dependencies": {
+    "@ianwalter/web-ext-webpack-plugin": "^0.1.0",
     "@typescript-eslint/eslint-plugin": "2.x",
     "@typescript-eslint/parser": "2.x",
     "autoprefixer": "^9.8.5",

@@ -37,7 +37,7 @@ build().then(
 ).catch(err => {
   console.log(chalk.red('x ... Failed to compile.\n'))
   console.log((err.message || err) + '\n')
-  process.exit(1) 
+  process.exit(1)
 })
 
 function build () {
