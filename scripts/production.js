@@ -48,6 +48,8 @@ module.exports = {
           eslintPath: require.resolve('eslint'),
           // 使用create-react-app 内置的格式化
           formatter: eslintFormatter,
+          // 因为我们开发的是firefox和chrome的扩展, 需要添加扩展的api对象为全局变量, 否则eslint会报错
+          globals: ['browser', 'chrome'],
           baseConfig: {
             extends: [require.resolve('eslint-config-react-app')]
           },
