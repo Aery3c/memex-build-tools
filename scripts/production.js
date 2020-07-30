@@ -208,5 +208,9 @@ module.exports = {
         sourceMap: true
       }
     })]
+  },
+  performance: {
+    // 关闭webpack性能提示引起警告而导致编译不通过
+    hints: false
   }
 }
